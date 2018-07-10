@@ -6,4 +6,8 @@
     <RootNamespace>Promociones.Domain.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain.Entities\Domain.Entities.csproj" />
+  </ItemGroup>
+
 </Project>
