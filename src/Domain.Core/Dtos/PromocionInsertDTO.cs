@@ -11,13 +11,13 @@ namespace Promociones.Domain.Core
     {
         public int Id { get; set; }
 
-         public int[] MedioPagoIds { get; set; }
+         public List<int> MedioPagoIds { get; set; }
      
-        public int[] TipoMedioPagoIds { get; set; }
+        public List<int> TipoMedioPagoIds { get; set; }
         
-        public int[] EntidadFinancieraIds { get; set; }
+        public List<int> EntidadFinancieraIds { get; set; }
       
-        public int[] ProductoCategoriaIds { get; set; }
+        public List<int> ProductoCategoriaIds { get; set; }
 
         public Nullable<int> MaxCantidadDeCuotas { get; set; }
 

@@ -18,6 +18,8 @@ using AutoMapper;
 using Autofac;
 using Promociones.Presentation.Api.Filters;
 
+using FluentValidation.AspNetCore;
+
 namespace Promociones.Presentation.Api
 {
     public class Startup
@@ -39,8 +41,10 @@ namespace Promociones.Presentation.Api
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(CustomExceptionFilterAttribute));
-            });
-            services.AddAutoMapper();
+                options.Filters.Add(typeof(ValidatorActionFilter));
+
+            }).AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Promociones API", Version = "v1" });

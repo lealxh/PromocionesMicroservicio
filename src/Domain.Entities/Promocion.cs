@@ -11,63 +11,87 @@ namespace Promociones.Domain.Entities
 {
     public class Promocion
     {
+        public Promocion()
+        {
+            this._EntidadFinancieraIds = "";
+            this._MedioPagoIds = "";
+            this._ProductoCategoriaIds="";
+            this._TipoMedioPagoIds = "";
 
+        }
         public int Id { get; set; }
 
         [JsonIgnore]
         public String _MedioPagoIds { get; set; }
         [NotMapped]
-        public int[] MedioPagoIds
+        public  List<int> MedioPagoIds
         {
             get
             {
-                return Array.ConvertAll(_MedioPagoIds.Split(','), Int32.Parse);
+                if (_MedioPagoIds==null || _MedioPagoIds.Trim().Length==0)
+                    return null;
+                return Array.ConvertAll(_MedioPagoIds.Split(','), Int32.Parse).ToList();
             }
             set
             {
-                _MedioPagoIds = String.Join(",", value.Select(p => p.ToString()).ToArray());
+                if(value !=null)
+                _MedioPagoIds = String.Join(",", value.Select(p => p.ToString()));
             }
         }
+
+
         [JsonIgnore]
         public String _TipoMedioPagoIds { get; set; }
         [NotMapped]
-        public int[] TipoMedioPagoIds
+        public  List<int> TipoMedioPagoIds
         {
             get
             {
-                return Array.ConvertAll(_TipoMedioPagoIds.Split(','), Int32.Parse);
+                if (_TipoMedioPagoIds==null ||_TipoMedioPagoIds.Trim().Length==0)
+                    return null;
+                return Array.ConvertAll(_TipoMedioPagoIds.Split(','), Int32.Parse).ToList();
             }
             set
             {
-                _TipoMedioPagoIds = String.Join(",", value.Select(p => p.ToString()).ToArray());
+                if (value != null)
+                 _TipoMedioPagoIds = String.Join(",", value.Select(p => p.ToString()));
             }
         }
         [JsonIgnore]
         public String _EntidadFinancieraIds { get; set; }
         [NotMapped]
-        public int[] EntidadFinancieraIds
+        public List<int> EntidadFinancieraIds
         {
             get
             {
-                return Array.ConvertAll(_EntidadFinancieraIds.Split(','), Int32.Parse);
+                if (_EntidadFinancieraIds==null ||_EntidadFinancieraIds.Trim().Length==0)
+                    return null;
+                return Array.ConvertAll(_EntidadFinancieraIds.Split(','), Int32.Parse).ToList();
             }
             set
             {
-                _EntidadFinancieraIds = String.Join(",", value.Select(p => p.ToString()).ToArray());
+                if (value != null)
+                 _EntidadFinancieraIds = String.Join(",", value.Select(p => p.ToString()));
             }
         }
         [JsonIgnore]
         public String _ProductoCategoriaIds { get; set; }
         [NotMapped]
-        public int[] ProductoCategoriaIds
+        public List<int> ProductoCategoriaIds
         {
             get
             {
-                return Array.ConvertAll(_ProductoCategoriaIds.Split(','), Int32.Parse);
+                if (_ProductoCategoriaIds==null ||_ProductoCategoriaIds.Trim().Length==0)
+                    return null;
+
+                return Array.ConvertAll(_ProductoCategoriaIds.Split(','), Int32.Parse).ToList();
+               
+                
             }
             set
             {
-                _ProductoCategoriaIds = String.Join(",", value.Select(p => p.ToString()).ToArray());
+                if (value != null)
+                  _ProductoCategoriaIds = String.Join(",", value.Select(p => p.ToString()));
             }
         }
 

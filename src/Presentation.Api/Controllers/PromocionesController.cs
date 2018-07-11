@@ -15,11 +15,11 @@ namespace Promociones.Presentation.Api.Controllers
     public class PromocionesController : Controller
     {
         private IPromocionesManager _context;
-        private ILogger _logger;
-        public PromocionesController(IPromocionesManager context, ILogger<PromocionesController> logger)
+        
+        public PromocionesController(IPromocionesManager context)
         {
             this._context = context;
-            this._logger = logger;
+           
         }
     // GET: api/<controller>
         [HttpGet]

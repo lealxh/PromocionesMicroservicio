@@ -16,12 +16,12 @@ namespace Promociones.Application
     {
         private  PromocionesDbContext _DbContext;
         private  IDateTime _datetime;
-        private  IMapper _mapper;
-        public PromocionesManager(PromocionesDbContext DbContext,IDateTime datetime,IMapper mapper)
+        
+        public PromocionesManager(PromocionesDbContext DbContext,IDateTime datetime)
         {
             this._DbContext = DbContext;
             this._datetime = datetime;
-            this._mapper = mapper;
+          
         }
 
 
@@ -86,14 +86,25 @@ namespace Promociones.Application
             }
 
         }
-
+        
         public async Task<Promocion> UpdatePromocion(PromocionUpdateDTO dto)
         {
             var promo = await _DbContext.Promociones.Where(p => p.Id == dto.Id).SingleOrDefaultAsync();
-            if(promo==null)
+            if (promo == null)
                 throw new EntityNotFoundException(nameof(Promocion), dto.Id.ToString());
 
-            Mapper.Map<PromocionUpdateDTO,Promocion>(dto, promo);
+
+            //_mapper.Map<PromocionUpdateDTO,Promocion>(dto, promo);
+            promo.MedioPagoIds = dto.MedioPagoIds;
+            promo.EntidadFinancieraIds = dto.EntidadFinancieraIds;
+            promo.ProductoCategoriaIds = dto.ProductoCategoriaIds;
+            promo.TipoMedioPagoIds = dto.TipoMedioPagoIds;
+
+            if (dto.MaxCantidadDeCuotas!=null)
+            promo.MaxCantidadDeCuotas = dto.MaxCantidadDeCuotas;
+            if (dto.PorcentajeDecuento != null)
+            promo.PorcentajeDecuento = dto.PorcentajeDecuento;
+
             promo.FechaModificacion = _datetime.Now;
 
             _DbContext.Update(promo);
@@ -104,8 +115,24 @@ namespace Promociones.Application
 
         public async Task<Promocion> InsertPromocion(PromocionInsertDTO dto)
         {
-            var promo = _mapper.Map<PromocionInsertDTO, Promocion>(dto);
-            promo.FechaCreacion = _datetime.Now;
+            Promocion promo = new Promocion()
+            {
+                Activo = true,
+                EntidadFinancieraIds = dto.EntidadFinancieraIds,
+                FechaFin = dto.FechaFin,
+                FechaCreacion = _datetime.Now,
+                FechaInicio = dto.FechaInicio,
+                MaxCantidadDeCuotas = dto.MaxCantidadDeCuotas,
+                MedioPagoIds = dto.MedioPagoIds,
+                PorcentajeDecuento = dto.PorcentajeDecuento,
+                ProductoCategoriaIds = dto.ProductoCategoriaIds,
+                TipoMedioPagoIds = dto.TipoMedioPagoIds
+
+            };
+
+            DateTime startDt = dto.FechaInicio;
+            DateTime endDt = dto.FechaFin;
+         
             _DbContext.Add(promo);
            await _DbContext.SaveChangesAsync();
 
