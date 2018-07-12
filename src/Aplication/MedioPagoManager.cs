@@ -15,25 +15,19 @@ namespace Promociones.Application
 {
     public class MedioPagoManager : IMedioPagoManager
     {
+        public MedioPagoManager()
+        {
+
+        }
         IRequestsManager _requestManeger;
         public MedioPagoManager(IRequestsManager requestManager)
         {
             this._requestManeger = requestManager;
         }
 
-        public MedioPago GetMedioPago(int Id)
+        public virtual MedioPago GetMedioPago(int Id)
         {
-            IEnumerable<MedioPago> mediosPago = new List<MedioPago>()
-            {
-                new MedioPago(){ Id=1,Descripcion="MercadoPago"},
-                new MedioPago(){ Id=2,Descripcion="Visa Debito"},
-                new MedioPago(){ Id=3,Descripcion="Visa"},
-                new MedioPago(){ Id=4,Descripcion="MasterCard"},
-                new MedioPago(){ Id=5,Descripcion="American Express"}
-            };
-            return mediosPago.Where(x => x.Id == Id).SingleOrDefault<MedioPago>();
-            
-
+           
             JToken resp = _requestManeger.GetRequest("mediodepago/" + Id).Result;
 
             if (resp != null)

@@ -14,8 +14,8 @@ namespace Promociones.Domain.Core
         Task<IEnumerable<Promocion>> GetPromocionesVigentes();
         Task<IEnumerable<Promocion>> GetPromocionesVigentes(DateTime Fecha);
         Task<Boolean> ValidarVigencia(int Id);
-        Task<IEnumerable<Promocion>> GetPromocionesVigentesVenta(QueryPromocionesDTO producto);
-        Task<Boolean> DeletePromociones(PromocionDeleteDTO dto);
+        Task<IEnumerable<Promocion>> GetPromocionesVenta(QueryPromocionesDTO producto);
+        Task<int> DeletePromociones(PromocionDeleteDTO dto);
         Task<Promocion> UpdatePromocion(PromocionUpdateDTO dto);
         Task<Promocion> InsertPromocion(PromocionInsertDTO dto);
     }

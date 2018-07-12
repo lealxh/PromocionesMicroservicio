@@ -23,58 +23,110 @@ namespace Promociones.Presentation.Api.Controllers
         }
     // GET: api/<controller>
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> GetAllPromociones()
         {
             return Ok(await this._context.GetPromociones());
         }
 
         [HttpGet("{id}", Name = "PromocionById")]
-        public async Task<ActionResult> Get(int id)
+        public async Task<ActionResult> GetPromocionById(int id)
         {
             return Ok(await this._context.GetPromocion(id));
         }
 
         [HttpGet("Vigentes/", Name = "Promociones_vigentes")]
-        public async Task<IActionResult> Vigentes()
+        public async Task<IActionResult> GetPromocionesVigentes()
         {
              return Ok(await _context.GetPromocionesVigentes());
 
         }
 
         [HttpGet("Vigentes/{Fecha}", Name = "Promociones_vigentes_fecha")]
-        public async Task<IActionResult> Vigentes(DateTime Fecha)
+        public async Task<IActionResult> GetPromocionesVigentesEnFecha(DateTime Fecha)
         {
-              return Ok(await _context.GetPromocionesVigentes(Fecha));
+            return Ok(await _context.GetPromocionesVigentes(Fecha));   
+        }
 
+        [HttpGet("Venta/", Name = "Promociones_venta")]
+        public async Task<IActionResult> GetPromocionesVenta(QueryPromocionesDTO dto)
+        {
+            return Ok(await _context.GetPromocionesVenta(dto));
         }
 
         // GET api/<controller>/5
         [HttpGet("ValidarVigencia/{id}")]
-        public async Task<IActionResult> ValidarVigencia(int id)
+        public async Task<IActionResult> GetVigenciaPromocion(int id)
         {
-              return Ok(await _context.ValidarVigencia(id));
+            try
+            {
+                return Ok(await _context.ValidarVigencia(id));
+            }
+            catch (EntityNotFoundException)
+            {
+                return NotFound("No se encontraron promociones con el Id: "+id);
+            }
+            
         }
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PromocionInsertDTO dto)
+        public async Task<IActionResult> CrearPromocion([FromBody] PromocionInsertDTO dto)
         {
-            var promo = await _context.InsertPromocion(dto);
-            return Created("api/Promociones/"+promo.Id,promo);
+
+            try
+            {
+                var promo = await _context.InsertPromocion(dto);
+                return Created("api/Promociones/" + promo.Id, promo);
+
+            }
+            catch (InvalidCategoriaException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (InvalidMedioPagoException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT api/<controller>/5
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] PromocionUpdateDTO dto)
+        public async Task<IActionResult> ModificarPromocion([FromBody] PromocionUpdateDTO dto)
         {
-            return Ok(await _context.UpdatePromocion(dto));
+            try
+            {
+                return Ok(await _context.UpdatePromocion(dto));
+            }
+            catch (EntityNotFoundException)
+            {
+                return NotFound("No se encontraron promociones con el Id: "+dto.Id);
+            }
+            catch (InvalidCategoriaException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (InvalidMedioPagoException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
         }
 
         // DELETE api/<controller>/5
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody]PromocionDeleteDTO dto)
+        public async Task<IActionResult> DeletePromocion([FromBody]PromocionDeleteDTO dto)
         {
-            return Ok(await _context.DeletePromociones(dto));
+            try
+            {
+                return Ok(await _context.DeletePromociones(dto));
+            }
+            catch (EntityNotFoundException)
+            {
+                return NotFound("No se encontraron las promociones indicadas");
+            }
+           
+
         }
     }
 }

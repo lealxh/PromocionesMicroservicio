@@ -16,11 +16,14 @@ namespace Promociones.Application
     {
         private  PromocionesDbContext _DbContext;
         private  IDateTime _datetime;
-        
-        public PromocionesManager(PromocionesDbContext DbContext,IDateTime datetime)
+        private IProductosManager _prmanager;
+        private IMedioPagoManager _mpmanager;
+        public PromocionesManager(PromocionesDbContext DbContext,IDateTime datetime,IProductosManager prmanager,IMedioPagoManager mpmanager)
         {
             this._DbContext = DbContext;
             this._datetime = datetime;
+            this._prmanager = prmanager;
+            this._mpmanager = mpmanager;
           
         }
 
@@ -52,20 +55,18 @@ namespace Promociones.Application
 
         }
 
-        public async Task<IEnumerable<Promocion>> GetPromocionesVigentesVenta(QueryPromocionesDTO venta)
+        public async Task<IEnumerable<Promocion>> GetPromocionesVenta(QueryPromocionesDTO venta)
         {
 
             return await _DbContext.Promociones.
-                Where(promo => promo.MedioPagoIds.Contains(venta.MedioPagoId) &&
-                promo.TipoMedioPagoIds.Contains(venta.TipoMedioPagoId) && 
-                promo.ProductoCategoriaIds.Contains(venta.ProductoCategoriaId)&&
-                promo.EntidadFinancieraIds.Contains(venta.EntidadFinancieraId)&&
-                promo.MaxCantidadDeCuotas>=venta.CantidadDeCuotas &&
-                promo.ProductoCategoriaIds.Contains(venta.ProductoCategoriaId) 
-                ).ToListAsync();
+                Where(promo => ((promo.MedioPagoIds == null || promo.MedioPagoIds.Contains(venta.MedioPagoId)) &&
+                (promo.TipoMedioPagoIds == null || promo.TipoMedioPagoIds.Contains(venta.TipoMedioPagoId)) &&
+                (promo.ProductoCategoriaIds == null || promo.ProductoCategoriaIds.Contains(venta.ProductoCategoriaId)) &&
+                (promo.EntidadFinancieraIds == null || promo.EntidadFinancieraIds.Contains(venta.EntidadFinancieraId)) &&
+                (promo.MaxCantidadDeCuotas==null || promo.MaxCantidadDeCuotas >= venta.CantidadDeCuotas))).ToListAsync();
         }
 
-        public async Task<bool> DeletePromociones(PromocionDeleteDTO dto)
+        public async Task<int> DeletePromociones(PromocionDeleteDTO dto)
         {
             var promociones = await _DbContext.Promociones.Where(p => p.Activo && dto.PromocionesIds.Contains(p.Id)).ToListAsync();
 
@@ -77,7 +78,7 @@ namespace Promociones.Application
                     _DbContext.Update(item);
                 }
                 await _DbContext.SaveChangesAsync();
-                return true;
+                return promociones.Count;
 
             }
             else
@@ -86,12 +87,41 @@ namespace Promociones.Application
             }
 
         }
-        
+        private bool ValidarCategorias(List<int> categoriasPromocion)
+        {
+            var allCategorias = _prmanager.GetCategorias();
+            if(categoriasPromocion!=null)
+            foreach (int idCategoria in categoriasPromocion)
+            {
+                if (!allCategorias.Any(x => x.Id == idCategoria))
+                    return false;
+            }
+
+            return true;
+        }
+        private bool ValidarMediosPago(List<int> mediosPagoPromocion)
+        {
+            
+            if (mediosPagoPromocion != null)
+            foreach (int idMedioPago in mediosPagoPromocion)
+            {
+                if (_mpmanager.GetMedioPago(idMedioPago)==null)
+                    return false;
+            }
+
+            return true;
+        }
         public async Task<Promocion> UpdatePromocion(PromocionUpdateDTO dto)
         {
             var promo = await _DbContext.Promociones.Where(p => p.Id == dto.Id).SingleOrDefaultAsync();
             if (promo == null)
                 throw new EntityNotFoundException(nameof(Promocion), dto.Id.ToString());
+
+            if (!ValidarCategorias(dto.ProductoCategoriaIds))
+                throw new InvalidCategoriaException(String.Join(",", dto.ProductoCategoriaIds.Select(p => p.ToString())));
+
+            if (!ValidarMediosPago(dto.MedioPagoIds))
+                throw new InvalidMedioPagoException(String.Join(",", dto.MedioPagoIds.Select(p => p.ToString())));
 
 
             //_mapper.Map<PromocionUpdateDTO,Promocion>(dto, promo);
@@ -108,13 +138,22 @@ namespace Promociones.Application
             promo.FechaModificacion = _datetime.Now;
 
             _DbContext.Update(promo);
-            _DbContext.SaveChanges();
+
+           await _DbContext.SaveChangesAsync();
+
             return promo;
 
         }
 
         public async Task<Promocion> InsertPromocion(PromocionInsertDTO dto)
         {
+            if (!ValidarCategorias(dto.ProductoCategoriaIds))
+                throw new InvalidCategoriaException(String.Join(",", dto.ProductoCategoriaIds.Select(p => p.ToString())));
+
+            if (!ValidarMediosPago(dto.MedioPagoIds))
+                throw new InvalidMedioPagoException(String.Join(",", dto.MedioPagoIds.Select(p => p.ToString())));
+
+
             Promocion promo = new Promocion()
             {
                 Activo = true,

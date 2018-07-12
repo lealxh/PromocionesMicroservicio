@@ -12,6 +12,10 @@ namespace Promociones.Application
 {
     public class ProductosManager : IProductosManager
     {
+        public ProductosManager()
+        {
+
+        }
         private readonly IRequestsManager _requestManager;
         public ProductosManager(IRequestsManager requestManager)
         {
@@ -19,19 +23,8 @@ namespace Promociones.Application
       
         }
         
-        public List<ProductoCategoria> GetCategorias()
+        public virtual List<ProductoCategoria> GetCategorias()
         {
-
-            var categorias = new List<ProductoCategoria>
-            {
-                new ProductoCategoria() { Id = 1, Descripcion = "Tvs" },
-                new ProductoCategoria() { Id = 2, Descripcion = "Heladeras" },
-                new ProductoCategoria() { Id = 3, Descripcion = "Lavarropas" },
-                new ProductoCategoria() { Id = 4, Descripcion = "Celulares" },
-                new ProductoCategoria() { Id = 5, Descripcion = "Notebooks" },
-                new ProductoCategoria() { Id = 6, Descripcion = "Gaming" }
-            };
-            return categorias;
 
             var resp =  _requestManager.GetRequest( "producto/categorias").Result;
 
