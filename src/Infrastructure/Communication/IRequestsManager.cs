@@ -10,7 +10,7 @@ namespace Promociones.Infrastructure
 {
     public interface IRequestsManager
     {
-        Task<JToken> GetRequest(string url);
+        Task<JToken> GetRequest(string baseurl,string requesturl);
 
     }
 }

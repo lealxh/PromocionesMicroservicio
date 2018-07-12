@@ -26,7 +26,7 @@ namespace Promociones.Application
         public virtual List<ProductoCategoria> GetCategorias()
         {
 
-            var resp =  _requestManager.GetRequest( "producto/categorias").Result;
+            var resp =  _requestManager.GetRequest("http://localhost:17479/", "producto/categorias").Result;
 
             if (resp != null)
                 return JsonConvert.DeserializeObject<List<ProductoCategoria>>(resp.ToString());

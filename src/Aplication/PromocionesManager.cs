@@ -87,6 +87,24 @@ namespace Promociones.Application
             }
 
         }
+        private List<Promocion>GetOverlappingDates(DateTime inicio,DateTime fin)
+        {
+            //( start1 <= end2 and start2 <= end1 )
+            var overlappin= _DbContext.Promociones.Where(x => x.FechaInicio <=fin && inicio<=x.FechaFin).ToList();
+
+            return overlappin;
+        }
+
+        private List<int> JoinedLists(List<int> list1, List<int> list2)
+        {
+            var IDs = list2.Select(item => item);
+            var result = list1.Where(item => IDs.Contains(item));
+
+
+
+
+            return result.ToList<int>();
+        }
         private bool ValidarCategorias(List<int> categoriasPromocion)
         {
             var allCategorias = _prmanager.GetCategorias();
@@ -123,6 +141,7 @@ namespace Promociones.Application
             if (!ValidarMediosPago(dto.MedioPagoIds))
                 throw new InvalidMedioPagoException(String.Join(",", dto.MedioPagoIds.Select(p => p.ToString())));
 
+            
 
             //_mapper.Map<PromocionUpdateDTO,Promocion>(dto, promo);
             promo.MedioPagoIds = dto.MedioPagoIds;
@@ -153,8 +172,19 @@ namespace Promociones.Application
             if (!ValidarMediosPago(dto.MedioPagoIds))
                 throw new InvalidMedioPagoException(String.Join(",", dto.MedioPagoIds.Select(p => p.ToString())));
 
+            var overlapping = GetOverlappingDates(dto.FechaInicio, dto.FechaFin);
+            if (overlapping.Count() > 0)
+            {
+                var result = overlapping.
+                    Where(x => (x.MedioPagoIds == null || JoinedLists(x.MedioPagoIds, dto.MedioPagoIds).Count() > 0) &&
+                   (x.TipoMedioPagoIds == null || JoinedLists(x.TipoMedioPagoIds, dto.TipoMedioPagoIds).Count() > 0)).ToList();
 
-            Promocion promo = new Promocion()
+                if (result.Count() > 0)
+                    throw new DuplicidadException();
+
+            }
+
+        Promocion promo = new Promocion()
             {
                 Activo = true,
                 EntidadFinancieraIds = dto.EntidadFinancieraIds,

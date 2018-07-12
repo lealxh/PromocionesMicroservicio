@@ -30,7 +30,6 @@ namespace Promociones.Presentation.Api
  {
         public PromocionInsertDTORules()
         {
-            RuleFor(m => m.Id).GreaterThan(0);
             RuleFor(m => m.PorcentajeDecuento).GreaterThan(0).LessThanOrEqualTo(100);
             RuleFor(m => m.ProductoCategoriaIds).SetValidator(new ValidatorPropertyCategoria(new ProductosManager(new RequestManager())));
         }

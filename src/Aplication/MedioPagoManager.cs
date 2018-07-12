@@ -28,7 +28,7 @@ namespace Promociones.Application
         public virtual MedioPago GetMedioPago(int Id)
         {
            
-            JToken resp = _requestManeger.GetRequest("mediodepago/" + Id).Result;
+            JToken resp = _requestManeger.GetRequest("http://localhost:17479/", "mediodepago/" + Id).Result;
 
             if (resp != null)
                 return JsonConvert.DeserializeObject<MedioPago>(resp.ToString());

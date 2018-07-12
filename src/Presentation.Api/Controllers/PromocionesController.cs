@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Promociones.Application;
 using Promociones.Domain.Core;
+using Promociones.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -26,6 +27,36 @@ namespace Promociones.Presentation.Api.Controllers
         public async Task<ActionResult> GetAllPromociones()
         {
             return Ok(await this._context.GetPromociones());
+        }
+
+        [HttpGet("/producto/categorias", Name = "categorias")]
+        public ActionResult GetCategorias()
+        {
+               return Ok(new List<MedioPago>()
+            {
+                new MedioPago(){ Id=1,Descripcion="MercadoPago"},
+                new MedioPago(){ Id=2,Descripcion="Visa Debito"},
+                new MedioPago(){ Id=3,Descripcion="Visa"},
+                new MedioPago(){ Id=4,Descripcion="MasterCard"},
+                new MedioPago(){ Id=5,Descripcion="American Express"}
+            });
+        }
+        [HttpGet("/mediodepago/{id}", Name = "mediopago")]
+        public ActionResult GetMediosPago(int id)
+        {
+            var medios=new List<MedioPago>()
+            {
+                new MedioPago(){ Id=1,Descripcion="MercadoPago"},
+                new MedioPago(){ Id=2,Descripcion="Visa Debito"},
+                new MedioPago(){ Id=3,Descripcion="Visa"},
+                new MedioPago(){ Id=4,Descripcion="MasterCard"},
+                new MedioPago(){ Id=5,Descripcion="American Express"}
+            };
+            var res = medios.SingleOrDefault(x => x.Id == id);
+            if(res== null)
+                return NotFound();
+
+            return Ok(res);
         }
 
         [HttpGet("{id}", Name = "PromocionById")]
@@ -86,6 +117,10 @@ namespace Promociones.Presentation.Api.Controllers
             catch (InvalidMedioPagoException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (DuplicidadException exc)
+            {
+                return BadRequest(exc.Message);
             }
         }
 

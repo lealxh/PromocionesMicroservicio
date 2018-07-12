@@ -395,7 +395,6 @@ namespace Tests
                 PorcentajeDecuento = 15,
             });
 
-
             Assert.True(result is BadRequestObjectResult);
 
             
@@ -551,7 +550,46 @@ namespace Tests
             Assert.False(vigente);
 
 
-            
+        }
+
+        [Fact]
+        public async void CrearPromocion_ShoulReturnDuplicidadException()
+        {
+            //el contexto esta poblado con promociones vigentes este año desde junio a junio del 2018 y una promocion de enero a junio de 2018
+            int elementosAntes = context.Promociones.Count(x => x.Activo);
+            Mock<ProductosManager> mokPR = new Mock<ProductosManager>();
+            mokPR.Setup(x => x.GetCategorias()).Returns(testDataCategorias);
+
+            Mock<MedioPagoManager> mokMP = new Mock<MedioPagoManager>();
+            mokMP.Setup(x => x.GetMedioPago(1)).Returns(testDataMediosPago[0]);
+            mokMP.Setup(x => x.GetMedioPago(2)).Returns(testDataMediosPago[1]);
+            mokMP.Setup(x => x.GetMedioPago(3)).Returns(testDataMediosPago[2]);
+            mokMP.Setup(x => x.GetMedioPago(4)).Returns(testDataMediosPago[3]);
+            mokMP.Setup(x => x.GetMedioPago(5)).Returns(testDataMediosPago[4]);
+
+            Mock<IDateTime> mockDateTimeNow = new Mock<IDateTime>();
+            mockDateTimeNow.Setup(x => x.Now).Returns(new DateTime(2018, 08, 01));// fecha moqueada a la segunda mitad del año
+
+
+            var controller = new PromocionesController(new PromocionesManager(context, mockDateTimeNow.Object, mokPR.Object, mokMP.Object));
+
+            var result = await controller.CrearPromocion(new PromocionInsertDTO()
+            {
+                Activo = true,
+                TipoMedioPagoIds = new List<int> { 1 },
+                EntidadFinancieraIds = new List<int> { 1 },
+                MedioPagoIds = new List<int> { 1 },
+                ProductoCategoriaIds = new List<int> { 1, 2, 3, 4, 5, 6 },
+                MaxCantidadDeCuotas = 12,
+                PorcentajeDecuento = 5,
+                FechaInicio = new DateTime(2017, 06, 01),
+                FechaFin = new DateTime(2018, 06, 01)
+            });//promocion 6 vigente solo por la primera mitad del año
+          
+            Assert.True(result is BadRequestObjectResult);
+
+
+
 
 
         }
