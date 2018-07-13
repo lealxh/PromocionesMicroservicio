@@ -15,20 +15,24 @@ namespace Promociones.Application
 {
     public class MedioPagoManager : IMedioPagoManager
     {
+        public IConfiguration Configuration { get; set; }
+        IRequestsManager _requestManeger;
+        public MedioPagoManager(IRequestsManager requestManager, IConfiguration Configuration)
+        {
+            this._requestManeger = requestManager;
+            this.Configuration = Configuration;
+        }
         public MedioPagoManager()
         {
 
         }
-        IRequestsManager _requestManeger;
-        public MedioPagoManager(IRequestsManager requestManager)
-        {
-            this._requestManeger = requestManager;
-        }
 
         public virtual MedioPago GetMedioPago(int Id)
         {
-           
-            JToken resp = _requestManeger.GetRequest("http://localhost:17479/", "mediodepago/" + Id).Result;
+
+            String baseurl=Configuration.GetValue<String>("BaseUrl");
+            String requesturi = Configuration.GetValue<String>("MedioPagoURI");
+            JToken resp = _requestManeger.GetRequest(baseurl,requesturi + Id).Result;
 
             if (resp != null)
                 return JsonConvert.DeserializeObject<MedioPago>(resp.ToString());

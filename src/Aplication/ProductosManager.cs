@@ -17,16 +17,20 @@ namespace Promociones.Application
 
         }
         private readonly IRequestsManager _requestManager;
-        public ProductosManager(IRequestsManager requestManager)
+        public IConfiguration Configuration { get; set; }
+        public ProductosManager(IRequestsManager requestManager, IConfiguration Configuration)
         {
             this._requestManager = requestManager;
-      
+            this.Configuration = Configuration;
+
         }
         
         public virtual List<ProductoCategoria> GetCategorias()
         {
 
-            var resp =  _requestManager.GetRequest("http://localhost:17479/", "producto/categorias").Result;
+            String baseurl = Configuration.GetValue<String>("BaseUrl");
+            String requesturi = Configuration.GetValue<String>("CategoriasURI");
+            var resp =  _requestManager.GetRequest(baseurl, requesturi).Result;
 
             if (resp != null)
                 return JsonConvert.DeserializeObject<List<ProductoCategoria>>(resp.ToString());

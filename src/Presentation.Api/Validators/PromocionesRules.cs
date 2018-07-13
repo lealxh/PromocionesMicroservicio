@@ -19,9 +19,7 @@ namespace Promociones.Presentation.Api
         {
             RuleFor(m => m.Id).GreaterThan(0).WithMessage("Id invalido"); ;
             RuleFor(m => m.PorcentajeDecuento).GreaterThan(0).LessThanOrEqualTo(100).WithMessage("Porcentaje invalido");   
-            RuleFor(m=>m.ProductoCategoriaIds).SetValidator(new ValidatorPropertyCategoria(new ProductosManager(new RequestManager())));
-            RuleFor(m => m.MedioPagoIds).SetValidator(new ValidatorPropertyMedioPago(new MedioPagoManager(new RequestManager())));
-
+         
         }
     }
 
@@ -30,8 +28,7 @@ namespace Promociones.Presentation.Api
  {
         public PromocionInsertDTORules()
         {
-            RuleFor(m => m.PorcentajeDecuento).GreaterThan(0).LessThanOrEqualTo(100);
-            RuleFor(m => m.ProductoCategoriaIds).SetValidator(new ValidatorPropertyCategoria(new ProductosManager(new RequestManager())));
+            RuleFor(m => m.PorcentajeDecuento).GreaterThan(0).LessThanOrEqualTo(100).WithMessage("Porcentaje invalido");
         }
 }
 
